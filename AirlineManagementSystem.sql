@@ -25,14 +25,27 @@ CREATE TABLE IF NOT EXISTS FlightDelays (
     FOREIGN KEY (flight_id) REFERENCES Flights(flight_id)
 );
 
-INSERT OR IGNORE INTO Airports (airport_id, airport_name, city, country) 
+INSERT OR IGNORE INTO Airports (airport_id, airport_name, city, country)
 VALUES (1, 'Indira Gandhi International', 'Delhi', 'India');
 
-INSERT OR IGNORE INTO Airports (airport_id, airport_name, city, country) 
+INSERT OR IGNORE INTO Airports (airport_id, airport_name, city, country)
 VALUES (2, 'Chhatrapati Shivaji International', 'Mumbai', 'India');
 
-INSERT OR IGNORE INTO Flights (flight_id, flight_number, origin_airport_id, destination_airport_id, scheduled_departure) 
+INSERT OR IGNORE INTO Flights (
+    flight_id, flight_number, origin_airport_id, destination_airport_id, scheduled_departure
+)
 VALUES (1, 'E23030', 1, 2, '2026-02-21 22:00:00');
 
-INSERT OR IGNORE INTO FlightDelays (flight_id, delay_reason, delay_duration_minutes) 
-VALUES (1, 'Technical Glitch', 45);
+-- Keep the sample delay idempotent because the application runs this script
+-- on every launch. FlightDelays has no unique constraint for this tuple.
+INSERT INTO FlightDelays (flight_id, delay_reason, delay_duration_minutes)
+SELECT f.flight_id, 'Technical Glitch', 45
+FROM Flights AS f
+WHERE f.flight_number = 'E23030'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM FlightDelays AS fd
+      WHERE fd.flight_id = f.flight_id
+        AND fd.delay_reason = 'Technical Glitch'
+        AND fd.delay_duration_minutes = 45
+  );
