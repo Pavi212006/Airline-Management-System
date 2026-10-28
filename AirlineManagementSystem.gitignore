@@ -1,1 +1,10 @@
-airline.db
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local SQLite databases (already-tracked files must be untracked separately)
+*.db
+*.sqlite
+*.sqlite3
