@@ -20,12 +20,12 @@ A small educational command-line project demonstrating Python, SQLite, relationa
 
 Primary keys uniquely identify rows. Foreign keys link flights to airports and delay records to flights. The schedule query joins Flights to Airports twice: once for the origin and once for the destination. The delay query joins Flights with FlightDelays.
 
-The SQL setup script uses CREATE TABLE IF NOT EXISTS and INSERT OR IGNORE, so the included sample records are not duplicated when the script is run again. Review the SQL file before using this against any database containing data you care about.
+The SQL setup script uses `CREATE TABLE IF NOT EXISTS` and checks for an existing matching sample delay before inserting it. This is important because the application executes the setup script on every launch. Review the SQL file before using this against any database containing data you care about.
 
 ## Requirements
 
 - Python 3.10 or newer
-- SQLite support included with Python's sqlite3 module
+- SQLite support included with Python's `sqlite3` module
 
 No third-party Python packages are required.
 
@@ -44,8 +44,18 @@ Choose:
 2. **Check flight delays** and enter a flight number such as E23030.
 3. **Exit** to close the database connection.
 
+## Tests
+
+Run the offline regression suite from the repository root:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The tests check schema and seed creation, repeat initialization, foreign-key enforcement, startup from another working directory, schedule output, case-insensitive delay lookup, and empty flight-number handling.
+
 ## Limitations and future improvements
 
 - The repository includes only a small sample schedule and delay record.
 - Flight data is static; no live status, ticketing, passenger management, payments, or seat allocation is implemented.
-- A production-style version could add input validation for flight creation, passenger/booking tables, transactions, tests, and a documented data-refresh strategy.
+- A production-style version could add passenger/booking tables, transactions, and a documented data-refresh strategy.
